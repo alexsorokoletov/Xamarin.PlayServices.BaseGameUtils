@@ -1,34 +1,19 @@
-using System;
+﻿using System;
 using Android.App;
 using Android.Content;
 using Android.Gms.Common.Apis;
 using Android.OS;
-using Android.Support.V4.App;
 using Android.Util;
-using Exception = System.Exception;
-using String = System.String;
+using BaseGameUtils;
+using Microsoft.Xna.Framework;
 
-namespace BaseGameUtils
+namespace CocosSharpBaseGameUtils
 {
+    /// <summary>
+    /// Use this instead of AndroidGameActivity for Games that use Google Play Services and CocosSharp 1.6.2
+    /// </summary>
     [Activity(Label = "BaseGameActivity")]
-    /**
-     * Example base class for games. This implementation takes care of setting up
-     * the API client object and managing its lifecycle. Subclasses only need to
-     * override the @link{#OnSignInSucceeded} and @link{#OnSignInFailed} abstract
-     * methods. To initiate the sign-in flow when the user clicks the sign-in
-     * button, subclasses should call @link{#beginUserInitiatedSignIn}. By default,
-     * this class only instantiates the GoogleApiClient object. If the PlusClient or
-     * AppStateClient objects are also wanted, call the BaseGameActivity(int)
-     * constructor and specify the requested clients. For example, to request
-     * PlusClient and GamesClient, use BaseGameActivity(CLIENT_GAMES | CLIENT_PLUS).
-     * To request all available clients, use BaseGameActivity(CLIENT_ALL).
-     * Alternatively, you can also specify the requested clients via
-     * @link{#setRequestedClients}, but you must do so before @link{#onCreate}
-     * gets called, otherwise the call will have no effect.
-     *
-     * @author Bruno Oliveira (Google)
-     */
-    public abstract class BaseGameActivity : FragmentActivity
+    public abstract class CCBaseGameActivity : AndroidGameActivity
     {
         // The game helper object. This class is mainly a wrapper around this object.
         public static GameHelper mHelper;
@@ -48,7 +33,7 @@ namespace BaseGameUtils
 
         /** Constructs a BaseGameActivity with default client (GamesClient). */
 
-        protected BaseGameActivity()
+        protected CCBaseGameActivity()
         {
         }
 
@@ -58,7 +43,7 @@ namespace BaseGameUtils
      *         CLIENT_PLUS and CLIENT_APPSTATE).
      */
 
-        protected BaseGameActivity(int requestedClients)
+        protected CCBaseGameActivity(int requestedClients)
         {
             setRequestedClients(requestedClients);
         }
@@ -181,7 +166,7 @@ namespace BaseGameUtils
         [Obsolete]
         protected void enableDebugLog(bool enabled, String tag)
         {
-            Log.Warn(TAG, "BaseGameActivity.enabledDebugLog(bool,String) is " +
+            Log.Warn(TAG, "CCBaseGameActivity.enabledDebugLog(bool,String) is " +
                           "deprecated. Use enableDebugLog(bool)");
             enableDebugLog(enabled);
         }
@@ -207,3 +192,4 @@ namespace BaseGameUtils
         }
     }
 }
+

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Android.App;
 using Android.Content;
-using Android.Gms.AppStates;
 using Android.Gms.Common;
 using Android.Gms.Common.Apis;
 using Android.Gms.Drive;
@@ -21,7 +20,7 @@ using String = System.String;
 
 namespace BaseGameUtils
 {
-    public class GameHelper : Object, IGoogleApiClientConnectionCallbacks, IGoogleApiClientOnConnectionFailedListener
+    public class GameHelper : Object, GoogleApiClient.IConnectionCallbacks, GoogleApiClient.IOnConnectionFailedListener
     {
         public static String TAG = "GameHelper";
 
@@ -81,8 +80,8 @@ namespace BaseGameUtils
         private bool mDebugLog;
         private bool mExpectingResolution;
         private GamesClass.GamesOptions mGamesApiOptions = GamesClass.GamesOptions.InvokeBuilder().Build();
-        private IGoogleApiClient mGoogleApiClient;
-        private GoogleApiClientBuilder mGoogleApiClientBuilder;
+        private GoogleApiClient mGoogleApiClient;
+        private GoogleApiClient.Builder mGoogleApiClientBuilder;
 
         /*
          * If we got an invitation when we connected to the games client, it's here.
@@ -313,7 +312,7 @@ namespace BaseGameUtils
          * GoogleApiClient.Builder before calling @link{#setup}.
          */
 
-        public GoogleApiClientBuilder CreateApiClientBuilder()
+        public GoogleApiClient.Builder CreateApiClientBuilder()
         {
             try
             {
@@ -325,14 +324,14 @@ namespace BaseGameUtils
                     throw new IllegalStateException(error);
                 }
 
-                var builder = new GoogleApiClientBuilder(mActivity, this, this);
+                var builder = new GoogleApiClient.Builder(mActivity, this, this);
 
                 if (0 != (mRequestedClients & CLIENT_GAMES))
                 {
                     try
                     {
                         //TODO: FIX
-                        builder.AddApi(GamesClass.Api, (Object)mGamesApiOptions);
+                        builder.AddApi(GamesClass.Api, mGamesApiOptions);
                     }
                     catch (Exception ex)
                     {
@@ -347,7 +346,7 @@ namespace BaseGameUtils
                 {
                     try
                     {
-                        builder.AddApi(PlusClass.Api);
+                        builder.AddApi(PlusClass.API);
                         builder.AddScope(PlusClass.ScopePlusLogin);
                     }
                     catch (Exception ex)
@@ -356,18 +355,18 @@ namespace BaseGameUtils
                     }
                 }
 
-                if (0 != (mRequestedClients & CLIENT_APPSTATE))
-                {
-                    try
-                    {
-                        builder.AddApi(AppStateManager.Api);
-                        builder.AddScope(AppStateManager.ScopeAppState);
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.ToString();
-                    }
-                }
+                //if (0 != (mRequestedClients & CLIENT_APPSTATE))
+                //{
+                //    try
+                //    {
+                //        builder.AddApi(AppStateManager.API);
+                //        builder.AddScope(Scopes.AppState);
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //        ex.ToString();
+                //    }
+                //}
 
                 if (0 != (mRequestedClients & CLIENT_SNAPSHOT))
                 {
@@ -440,7 +439,7 @@ namespace BaseGameUtils
          * must have called @link{setup}.
          */
 
-        public IGoogleApiClient getApiClient()
+        public GoogleApiClient getApiClient()
         {
             if (mGoogleApiClient == null)
             {
@@ -796,7 +795,7 @@ namespace BaseGameUtils
             try
             {
                 debugLog("Notifying LISTENER of sign-in "
-                         + (success  ? "SUCCESS" : mSignInFailureReason != null  ? "FAILURE (error)" : "FAILURE (no error)"));
+                         + (success ? "SUCCESS" : mSignInFailureReason != null ? "FAILURE (error)" : "FAILURE (no error)"));
                 if (mListener != null)
                 {
                     if (success)

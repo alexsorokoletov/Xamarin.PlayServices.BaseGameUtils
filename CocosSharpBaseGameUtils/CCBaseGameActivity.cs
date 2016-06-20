@@ -16,7 +16,7 @@ namespace CocosSharpBaseGameUtils
     public abstract class CCBaseGameActivity : AndroidGameActivity
     {
         // The game helper object. This class is mainly a wrapper around this object.
-        public static GameHelper mHelper;
+        private static GameHelper _gameHelper;
 
         // We expose these constants here because we don't want users of this class
         // to have to know about GameHelper at all.
@@ -28,8 +28,8 @@ namespace CocosSharpBaseGameUtils
         // Requested clients. By default, that's just the games client.
 
         private static String TAG = "BaseGameActivity";
-        protected bool mDebugLog = false;
-        protected int mRequestedClients = CLIENT_GAMES;
+        protected bool _isDebugLog = false;
+        protected int _requestedClients = CLIENT_GAMES;
 
         /** Constructs a BaseGameActivity with default client (GamesClient). */
 
@@ -45,7 +45,7 @@ namespace CocosSharpBaseGameUtils
 
         protected CCBaseGameActivity(int requestedClients)
         {
-            setRequestedClients(requestedClients);
+            SetRequestedClients(requestedClients);
         }
 
         /**
@@ -59,27 +59,27 @@ namespace CocosSharpBaseGameUtils
      *         and CLIENT_APPSTATE, or CLIENT_ALL to request all available clients.
      */
 
-        protected void setRequestedClients(int requestedClients)
+        protected void SetRequestedClients(int requestedClients)
         {
-            mRequestedClients = requestedClients;
+            _requestedClients = requestedClients;
         }
 
-        public GameHelper getGameHelper()
+        public GameHelper GetGameHelper()
         {
             try
             {
 
-                if (mHelper == null)
+                if (_gameHelper == null)
                 {
-                    mHelper = new GameHelper(this, mRequestedClients);
-                    mHelper.enableDebugLog(mDebugLog);
+                    _gameHelper = new GameHelper(this, _requestedClients);
+                    _gameHelper.enableDebugLog(_isDebugLog);
                 }
             }
             catch (Exception ex)
             {
                 ex.ToString();
             }
-            return mHelper;
+            return _gameHelper;
         }
 
         protected override void OnCreate(Bundle b)
@@ -87,11 +87,11 @@ namespace CocosSharpBaseGameUtils
             try
             {
                 base.OnCreate(b);
-                if (mHelper == null)
+                if (_gameHelper == null)
                 {
-                    getGameHelper();
+                    GetGameHelper();
                 }
-                mHelper.setup(this as IGameHelperListener);
+                _gameHelper.setup(this as IGameHelperListener);
             }
             catch (Exception ex)
             {
@@ -104,7 +104,7 @@ namespace CocosSharpBaseGameUtils
             try
             {
                 base.OnStart();
-                mHelper.onStart(this);
+                _gameHelper.onStart(this);
             }
             catch (Exception ex)
             {
@@ -115,80 +115,80 @@ namespace CocosSharpBaseGameUtils
         protected override void OnStop()
         {
             base.OnStop();
-            mHelper.onStop();
+            _gameHelper.onStop();
         }
 
-        protected override void OnActivityResult(int request, Result response, Intent data)
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
-            base.OnActivityResult(request, response, data);
-            mHelper.onActivityResult(request, (int)response, data);
+            base.OnActivityResult(requestCode, resultCode, data);
+            _gameHelper.onActivityResult(requestCode, (int)resultCode, data);
         }
 
-        protected GoogleApiClient getApiClient()
+        protected GoogleApiClient ApiClient
         {
-            return mHelper.getApiClient();
+            get { return _gameHelper.getApiClient(); }
         }
 
-        protected bool isSignedIn()
+        protected bool IsSignedIn
         {
-            return mHelper.isSignedIn();
+            get { return _gameHelper.isSignedIn(); }
         }
 
-        protected void beginUserInitiatedSignIn()
+        protected void BeginUserInitiatedSignIn()
         {
-            mHelper.beginUserInitiatedSignIn();
+            _gameHelper.beginUserInitiatedSignIn();
         }
 
-        protected void signOut()
+        protected void SignOut()
         {
-            mHelper.signOut();
+            _gameHelper.signOut();
         }
 
-        protected void showAlert(String message)
+        protected void ShowAlert(String message)
         {
-            mHelper.makeSimpleDialog(message).Show();
+            _gameHelper.makeSimpleDialog(message).Show();
         }
 
-        protected void showAlert(String title, String message)
+        protected void ShowAlert(String title, String message)
         {
-            mHelper.makeSimpleDialog(title, message).Show();
+            _gameHelper.makeSimpleDialog(title, message).Show();
         }
 
-        protected void enableDebugLog(bool enabled)
+        protected void EnableDebugLog(bool enabled)
         {
-            mDebugLog = true;
-            if (mHelper != null)
+            _isDebugLog = true;
+            if (_gameHelper != null)
             {
-                mHelper.enableDebugLog(enabled);
+                _gameHelper.enableDebugLog(enabled);
             }
         }
 
         [Obsolete]
-        protected void enableDebugLog(bool enabled, String tag)
+        protected void EnableDebugLog(bool enabled, String tag)
         {
             Log.Warn(TAG, "CCBaseGameActivity.enabledDebugLog(bool,String) is " +
                           "deprecated. Use enableDebugLog(bool)");
-            enableDebugLog(enabled);
+            EnableDebugLog(enabled);
         }
 
-        protected String getInvitationId()
+        protected String InvitationId
         {
-            return mHelper.getInvitationId();
+            get { return _gameHelper.getInvitationId(); }
         }
 
-        protected void reconnectClient()
+        protected void ReconnectClient()
         {
-            mHelper.reconnectClient();
+            _gameHelper.reconnectClient();
         }
 
-        protected bool hasSignInError()
+        protected bool HasSignInError
         {
-            return mHelper.hasSignInError();
+            get { return _gameHelper.hasSignInError(); }
         }
 
-        protected SignInFailureReason getSignInError()
+        protected SignInFailureReason SignInError
         {
-            return mHelper.getSignInError();
+            get { return _gameHelper.getSignInError(); }
         }
     }
 }
